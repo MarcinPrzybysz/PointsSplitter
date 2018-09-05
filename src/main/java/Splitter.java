@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,6 +9,7 @@ public class Splitter {
     private BufferedReader br = null;
     private String line = "";
     private String csvSplitBy = ",";
+    private char utfStart ='0';
 
     BufferedWriter out;
     String savePath;
@@ -56,14 +58,20 @@ public class Splitter {
                     out.newLine();
                     out.flush();
                 } else {
-                    if (!((points.get(i)[0].charAt(0) - '0') < 9)) {
+                    if (!((points.get(i)[0].charAt(0) - utfStart) < 10)) {
                         if (points.get(i)[0].charAt(0) != points.get(i - 1)[0].charAt(0)) {
                             checkIfExistsAndCreateFile(savePath, "pietro_" + String.valueOf(points.get(i)[0].charAt(0)));
                         }
                     }
-                    for (int j = 0; j < 4; j++) {
-                        out.write(points.get(i)[j] + "\t");
+                    try{
+                        for (int j = 0; j < 4; j++) {
+                            out.write(points.get(i)[j] + "\t");
+                        }
+                    }catch(ArrayIndexOutOfBoundsException e){
+                        System.out.println("Out of Bounds Exception");
+                        out.write("0.000");
                     }
+
                     out.newLine();
                     out.flush();
                 }
@@ -79,6 +87,8 @@ public class Splitter {
             }
         }
         System.out.println("SUCCESSFULLY SAVED FILES");
+
+        JOptionPane.showMessageDialog(null, "Pomyślnie zapisano", "", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void checkIfExistsAndCreateFile(String path, String fileName) throws IOException {
@@ -90,4 +100,6 @@ public class Splitter {
         out = new BufferedWriter(new FileWriter(path + fileName + ".txt", true));
         System.out.println("creating " + fileName + ".txt");
     }
+
+
 }
